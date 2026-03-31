@@ -4,20 +4,86 @@ extends Control
 @onready var title_label: Label = $TitleLabel
 @onready var choices_container: VBoxContainer = $ChoicesContainer
 @onready var close_button: Button = $CloseButton
+@onready var weapon_select: Control = $WeaponSelectScreen
 
 var available_choices: Array[Dictionary] = []
+var player: Node2D = null
+var show_weapon_select: bool = false
 
 
 func _ready() -> void:
 	hide()
-	GameManager.player.level_up_requested.connect(_on_level_up_requested)
+	
+	# Connect to game manager for player reference
+	await get_tree().create_timer(0.3).timeout
+	if GameManager.player:
+		player = GameManager.player
+	
 	close_button.pressed.connect(_on_close_button_pressed)
 
 
 func _on_level_up_requested() -> void:
 	show()
+	show_weapon_select = _should_show_weapon_select()
+	
+	if show_weapon_select:
+		title_label.text = "Level Up! Choose a Weapon or Upgrade"
+		_display_weapon_options()
+	else:
+		title_label.text = "Choose an Upgrade!"
+		generate_choices()
+		display_choices()
+
+
+func _should_show_weapon_select() -> bool:
+	if not player or not player.weapon_manager:
+		return true
+	
+	# Show weapon select if player has empty slot and less than max weapons
+	return player.weapon_manager.has_empty_slot() and player.weapon_manager.get_weapon_count() < 3
+
+
+func _display_weapon_options() -> void:
+	# Clear existing choices
+	for child in choices_container.get_children():
+		child.queue_free()
+	
+	# Create weapon selection button
+	var weapon_button = Button.new()
+	weapon_button.text = "Select New Weapon"
+	weapon_button.custom_minimum_size = Vector2(250, 60)
+	weapon_button.pressed.connect(_on_weapon_select_pressed)
+	choices_container.add_child(weapon_button)
+	
+	# Create upgrade button if player has weapons
+	if player.weapon_manager.get_weapon_count() > 0:
+		var upgrade_button = Button.new()
+		upgrade_button.text = "Upgrade Existing Weapon"
+		upgrade_button.custom_minimum_size = Vector2(250, 60)
+		upgrade_button.pressed.connect(_on_upgrade_select_pressed)
+		choices_container.add_child(upgrade_button)
+	
+	# Add stat upgrades
+	var separator = HSeparator.new()
+	choices_container.add_child(separator)
+	
 	generate_choices()
-	display_choices()
+	for choice in available_choices:
+		var button = Button.new()
+		button.text = "%s\n%s" % [choice.name, choice.description]
+		button.custom_minimum_size = Vector2(200, 60)
+		button.pressed.connect(_on_choice_selected.bind(choice))
+		choices_container.add_child(button)
+
+
+func _on_weapon_select_pressed() -> void:
+	if weapon_select:
+		weapon_select.show_weapon_select(player)
+
+
+func _on_upgrade_select_pressed() -> void:
+	if weapon_select:
+		weapon_select.show_upgrade_select(player)
 
 
 func generate_choices() -> void:
@@ -56,14 +122,17 @@ func display_choices() -> void:
 
 
 func _on_choice_selected(choice: Dictionary) -> void:
-	if GameManager.player and GameManager.player.has_method("add_stat"):
-		GameManager.player.add_stat(choice.stat, choice.value)
+	if player and player.has_method("add_stat"):
+		player.add_stat(choice.stat, choice.value)
 	
 	# Level up complete
+	_hide_and_continue()
+
+
+func _hide_and_continue() -> void:
 	GameManager.game_state = GameManager.GameState.PLAYING
 	hide()
 
 
 func _on_close_button_pressed() -> void:
-	GameManager.game_state = GameManager.GameState.PLAYING
-	hide()
+	_hide_and_continue()

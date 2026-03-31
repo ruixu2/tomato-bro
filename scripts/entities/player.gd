@@ -1,9 +1,11 @@
 extends CharacterBody2D
+class_name Player
 ## Player entity - controls movement, stats, weapons, and leveling
 
 signal level_up_requested
 signal health_changed(new_health: int, max_health: int)
 signal xp_changed(current_xp: int, max_xp: int)
+signal weapon_manager_ready(manager: WeaponManager)
 
 @export_group("Stats")
 @export var max_health: int = 100
@@ -23,14 +25,21 @@ var current_xp: int = 0
 var xp_to_next_level: int = 10
 var level: int = 1
 
-var weapon_slots: Array = []
-const MAX_WEAPONS: int = 6
-
+var weapon_manager: WeaponManager = null
 var is_alive: bool = true
 
 
 func _ready() -> void:
-	weapon_slots.resize(MAX_WEAPONS)
+	# Setup weapon manager
+	weapon_manager = WeaponManager.new()
+	weapon_manager.name = "WeaponManager"
+	add_child(weapon_manager)
+	weapon_manager.setup(self)
+	
+	# Add to players group
+	add_to_group("players")
+	
+	weapon_manager_ready.emit(weapon_manager)
 	update_health_display()
 
 
@@ -73,6 +82,7 @@ func heal(amount: int) -> void:
 func die() -> void:
 	is_alive = false
 	GameManager.game_over.emit()
+	queue_free()
 
 
 func add_xp(amount: int) -> void:
@@ -124,3 +134,19 @@ func add_stat(stat_name: String, value: float) -> void:
 			crit_mult += value
 	
 	update_health_display()
+
+
+func add_weapon(weapon_data: WeaponData, slot: int = -1) -> bool:
+	if weapon_manager:
+		return weapon_manager.add_weapon(weapon_data, slot)
+	return false
+
+
+func get_weapon_manager() -> WeaponManager:
+	return weapon_manager
+
+
+func get_total_dps() -> float:
+	if weapon_manager:
+		return weapon_manager.get_total_dps()
+	return 0.0
