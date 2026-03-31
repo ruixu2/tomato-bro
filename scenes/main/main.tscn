@@ -1,9 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://main_scene"]
+[gd_scene load_steps=4 format=3 uid="uid://main_scene"]
 
 [ext_resource type="Script" path="res://scripts/autoload/game_manager.gd" id="1_gm"]
 [ext_resource type="Script" path="res://scripts/game/game.gd" id="2_game"]
 [ext_resource type="PackedScene" uid="uid://player_scene" path="res://scenes/player/player.tscn" id="3_player"]
-[ext_resource type="Script" path="res://scripts/ui/weapon_select_screen.gd" id="4_weapon_select"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("2_game")
@@ -113,7 +112,7 @@ grow_vertical = "center"
 [node name="WeaponSelectScreen" type="Control" parent="UI/LevelUpScreen"]
 layout_mode = "anchor"
 anchors_preset = "full_rect"
-script = ExtResource("4_weapon_select")
+script = ExtResource("res://scripts/ui/weapon_select_screen.gd")
 
 [node name="CloseButton" type="Button" parent="UI/LevelUpScreen"]
 layout_mode = "anchor"

@@ -6,6 +6,7 @@ signal wave_started(wave_number: int)
 signal wave_ended(wave_number: int)
 signal game_over
 signal victory
+signal character_selected(character_data: CharacterData)
 
 const MAX_WAVES: int = 20
 const WAVE_DURATION: float = 90.0  # 90 seconds per wave like Brotato
@@ -16,8 +17,11 @@ var is_wave_active: bool = false
 var enemies_remaining: int = 0
 var game_state: GameState = GameState.MENU
 
+var selected_character: CharacterData = null
+
 enum GameState {
 	MENU,
+	CHARACTER_SELECT,
 	PLAYING,
 	SHOP,
 	LEVEL_UP,
@@ -35,12 +39,19 @@ func _ready() -> void:
 	pass
 
 
-func start_game() -> void:
+func start_game(character_data: CharacterData = null) -> void:
+	if character_data:
+		selected_character = character_data
+	else:
+		# Default to tomato if no character selected
+		selected_character = CharacterLoader.get_character("tomato")
+	
 	game_state = GameState.PLAYING
 	current_wave = 0
 	score = 0
 	gold = 0
 	current_level = 1
+	character_selected.emit(selected_character)
 	start_wave()
 
 
@@ -99,3 +110,9 @@ func add_gold(amount: int) -> void:
 
 func add_score(amount: int) -> void:
 	score += amount
+
+
+func return_to_menu() -> void:
+	game_state = GameState.MENU
+	selected_character = null
+	player = null

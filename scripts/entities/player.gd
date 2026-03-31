@@ -20,6 +20,7 @@ signal weapon_manager_ready(manager: WeaponManager)
 @export var damage_mult: float = 1.0
 @export var crit_chance: float = 0.0
 @export var crit_mult: float = 2.0
+@export var hp_regen: float = 0.0
 
 var current_xp: int = 0
 var xp_to_next_level: int = 10
@@ -27,6 +28,7 @@ var level: int = 1
 
 var weapon_manager: WeaponManager = null
 var is_alive: bool = true
+var character_data: CharacterData = null
 
 
 func _ready() -> void:
@@ -39,13 +41,48 @@ func _ready() -> void:
 	# Add to players group
 	add_to_group("players")
 	
+	# Connect to character select
+	GameManager.character_selected.connect(_on_character_selected)
+	
 	weapon_manager_ready.emit(weapon_manager)
+	update_health_display()
+
+
+func _on_character_selected(character: CharacterData) -> void:
+	if character:
+		character_data = character
+		_apply_character_stats(character)
+
+
+func _apply_character_stats(character: CharacterData) -> void:
+	max_health = character.max_health
+	health = character.max_health
+	move_speed = character.move_speed
+	armor = character.armor
+	luck = character.luck
+	pickup_range = character.pickup_range
+	attack_speed_mult = character.attack_speed_mult
+	damage_mult = character.damage_mult
+	crit_chance = character.crit_chance
+	crit_mult = character.crit_mult
+	hp_regen = character.hp_regen
+	
+	# Add starting weapon
+	if character.starting_weapon_id:
+		var weapon_data = WeaponLoader.get_weapon(character.starting_weapon_id)
+		if weapon_data:
+			add_weapon(weapon_data, 0)
+	
 	update_health_display()
 
 
 func _physics_process(delta: float) -> void:
 	if not is_alive:
 		return
+	
+	# HP regeneration
+	if hp_regen > 0:
+		health = min(health + hp_regen * delta, max_health)
 	
 	# Get input movement
 	var input_dir = Vector2.ZERO
@@ -132,6 +169,8 @@ func add_stat(stat_name: String, value: float) -> void:
 			crit_chance += value
 		"crit_mult":
 			crit_mult += value
+		"hp_regen":
+			hp_regen += value
 	
 	update_health_display()
 
