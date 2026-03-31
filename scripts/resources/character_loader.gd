@@ -12,6 +12,7 @@ static var _character_paths: Dictionary = {
 	"assassin": "res://resources/characters/assassin_data.gd",
 	"rocketeer": "res://resources/characters/rocketeer_data.gd",
 	"sniper": "res://resources/characters/sniper_character_data.gd",
+	"solo": "res://resources/characters/solo_data.gd",
 }
 
 

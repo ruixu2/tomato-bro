@@ -8,15 +8,21 @@ signal weapon_equipped(weapon: Weapon, slot: int)
 signal weapon_swapped(old_weapon: Weapon, new_weapon: Weapon)
 
 const MAX_WEAPONS = 2
+const SOLO_MAX_WEAPONS = 1  # For Solo character
 
 var weapons: Array[Weapon] = []
 var equipped_slots: Array[int] = []
 var player: Node2D = null
+var max_weapon_slots: int = MAX_WEAPONS
 
 
 func _ready() -> void:
 	weapons.resize(MAX_WEAPONS)
 	weapons.fill(null)
+
+
+func set_max_weapons(max_slots: int) -> void:
+	max_weapon_slots = max_slots
 
 
 func setup(p_player: Node2D) -> void:
@@ -28,8 +34,8 @@ func add_weapon(weapon_data: WeaponData, slot: int = -1) -> bool:
 	if slot == -1:
 		slot = _find_empty_slot()
 	
-	if slot == -1 or slot >= MAX_WEAPONS:
-		return false  # No empty slot available
+	if slot == -1 or slot >= max_weapon_slots:
+		return false  # No empty slot available or exceeded max slots
 	
 	# Remove existing weapon in slot if any
 	if weapons[slot] != null:
@@ -49,7 +55,7 @@ func add_weapon(weapon_data: WeaponData, slot: int = -1) -> bool:
 
 
 func remove_weapon(slot: int) -> bool:
-	if slot < 0 or slot >= MAX_WEAPONS:
+	if slot < 0 or slot >= max_weapon_slots:
 		return false
 	
 	var weapon = weapons[slot]
@@ -63,7 +69,7 @@ func remove_weapon(slot: int) -> bool:
 
 
 func equip_weapon(slot: int) -> bool:
-	if slot < 0 or slot >= MAX_WEAPONS:
+	if slot < 0 or slot >= max_weapon_slots:
 		return false
 	
 	var weapon = weapons[slot]
@@ -82,7 +88,7 @@ func equip_weapon(slot: int) -> bool:
 
 
 func swap_weapons(slot_a: int, slot_b: int) -> bool:
-	if slot_a < 0 or slot_a >= MAX_WEAPONS or slot_b < 0 or slot_b >= MAX_WEAPONS:
+	if slot_a < 0 or slot_a >= max_weapon_slots or slot_b < 0 or slot_b >= max_weapon_slots:
 		return false
 	
 	var weapon_a = weapons[slot_a]
@@ -96,7 +102,7 @@ func swap_weapons(slot_a: int, slot_b: int) -> bool:
 
 
 func upgrade_weapon(slot: int) -> bool:
-	if slot < 0 or slot >= MAX_WEAPONS:
+	if slot < 0 or slot >= max_weapon_slots:
 		return false
 	
 	var weapon = weapons[slot]
@@ -108,7 +114,7 @@ func upgrade_weapon(slot: int) -> bool:
 
 
 func get_weapon(slot: int) -> Weapon:
-	if slot < 0 or slot >= MAX_WEAPONS:
+	if slot < 0 or slot >= max_weapon_slots:
 		return null
 	return weapons[slot]
 
@@ -166,7 +172,7 @@ func get_total_dps() -> float:
 
 func get_stats_summary() -> Array[Dictionary]:
 	var stats: Array[Dictionary] = []
-	for i in range(MAX_WEAPONS):
+	for i in range(max_weapon_slots):
 		var weapon = weapons[i]
 		if weapon:
 			stats.append({

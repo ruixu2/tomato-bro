@@ -67,6 +67,12 @@ func _apply_character_stats(character: CharacterData) -> void:
 	crit_mult = character.crit_mult
 	hp_regen = character.hp_regen
 	
+	# Set max weapon slots based on character
+	if character.character_id == "solo":
+		weapon_manager.set_max_weapons(1)  # Solo can only have 1 weapon
+	else:
+		weapon_manager.set_max_weapons(2)  # Default 2 weapons
+	
 	# Add starting weapon
 	if character.starting_weapon_id:
 		var weapon_data = WeaponLoader.get_weapon(character.starting_weapon_id)

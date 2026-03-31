@@ -39,8 +39,11 @@ func _should_show_weapon_select() -> bool:
 	if not player or not player.weapon_manager:
 		return true
 	
-	# Show weapon select if player has empty slot and less than max weapons (2 slots)
-	return player.weapon_manager.has_empty_slot() and player.weapon_manager.get_weapon_count() < 2
+	# Check character's max weapon slots
+	var max_slots = player.weapon_manager.max_weapon_slots
+	
+	# Show weapon select if player has empty slot and less than max weapons
+	return player.weapon_manager.has_empty_slot() and player.weapon_manager.get_weapon_count() < max_slots
 
 
 func _display_weapon_options() -> void:

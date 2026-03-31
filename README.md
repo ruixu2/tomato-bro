@@ -6,8 +6,8 @@ A 2D top-down survivor roguelike game inspired by Brotato (土豆兄弟), built 
 
 - **Wave-based Survival**: Survive 20 waves of increasingly difficult enemies
 - **Auto-attack Combat**: Weapons fire automatically at nearby enemies
-- **Dual Weapon System**: Equip up to 2 weapons simultaneously
-- **8 Unique Characters**: Choose from different playstyles
+- **Dual Weapon System**: Equip up to 2 weapons (1 for Solo)
+- **9 Unique Characters**: Choose from different playstyles
 - **Character Progression**: Level up and choose upgrades between waves
 - **Multiple Stats**: Health, Armor, Luck, Attack Speed, Damage, Crit Chance, and more
 - **Pixel Art Style**: Classic 16-bit inspired pixel art aesthetic
@@ -34,6 +34,7 @@ A 2D top-down survivor roguelike game inspired by Brotato (土豆兄弟), built 
 | 🗡️ **Assassin** | 75 | 240 | 0 | 10% | 100% | 115% | 15% | 3x Crit mult |
 | 🚀 **Rocketeer** | 90 | 195 | 5 | 5% | 120% | 100% | 5% | Starts with Rocket |
 | 🎯 **Sniper** | 70 | 200 | 0 | 15% | 110% | 85% | 20% | Starts with Sniper |
+| 💜 **Solo** | 90 | 200 | 5 | 10% | 200% | 100% | 10% | 2x DMG, 1 weapon only |
 
 ## Weapons (10 Types)
 
