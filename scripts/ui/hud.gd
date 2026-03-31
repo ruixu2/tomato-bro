@@ -9,6 +9,8 @@ extends CanvasLayer
 @onready var gold_label: Label = $GoldLabel
 @onready var weapon_container: VBoxContainer = $WeaponContainer
 @onready var dps_label: Label = $DPSLabel
+@onready var speedup_label: Label = $SpeedupLabel
+@onready var speedup_button: Button = $SpeedupButton
 
 var player: Node2D = null
 var weapon_manager: WeaponManager = null
@@ -17,6 +19,10 @@ var weapon_manager: WeaponManager = null
 func _ready() -> void:
 	GameManager.wave_started.connect(_on_wave_started)
 	GameManager.wave_ended.connect(_on_wave_ended)
+	
+	# Connect speedup button
+	if speedup_button:
+		speedup_button.pressed.connect(_on_speedup_button_pressed)
 	
 	# Wait for player to be set up
 	await get_tree().create_timer(0.5).timeout
@@ -41,6 +47,15 @@ func _process(delta: float) -> void:
 	# Update DPS display
 	if weapon_manager:
 		dps_label.text = "DPS: %.1f" % weapon_manager.get_total_dps()
+	
+	# Update speedup status
+	if speedup_label:
+		if GameManager.wave_speedup_enabled:
+			speedup_label.text = "⏩ 2x SPEED"
+			speedup_label.modulate = Color(1, 1, 0, 1)  # Yellow
+		else:
+			speedup_label.text = "⏸ NORMAL"
+			speedup_label.modulate = Color(1, 1, 1, 1)  # White
 
 
 func update_health(current: int, max_val: int) -> void:
@@ -85,6 +100,16 @@ func _on_wave_started(wave_number: int) -> void:
 
 func _on_wave_ended(wave_number: int) -> void:
 	pass
+
+
+func _on_speedup_button_pressed() -> void:
+	GameManager.toggle_wave_speedup()
+
+
+func _input(event: InputEvent) -> void:
+	# Press V to toggle speedup
+	if event is InputEventKey and event.pressed and event.keycode == KEY_V:
+		GameManager.toggle_wave_speedup()
 
 
 func _update_weapon_display() -> void:

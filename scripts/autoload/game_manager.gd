@@ -9,15 +9,19 @@ signal victory
 signal character_selected(character_data: CharacterData)
 
 const MAX_WAVES: int = 20
-const WAVE_DURATION: float = 90.0  # 90 seconds per wave like Brotato
+const WAVE_DURATION: float = 60.0  # 60 seconds per wave (base duration)
+const MIN_WAVE_DURATION: float = 30.0  # Minimum wave duration with speedup
+const WAVE_SPEEDUP_MULTIPLIER: float = 2.0  # 2x speed = 30 seconds per wave
 
 var current_wave: int = 0
 var wave_timer: float = 0.0
+var wave_time_elapsed: float = 0.0  # Track elapsed time for speedup calculation
 var is_wave_active: bool = false
 var enemies_remaining: int = 0
 var game_state: GameState = GameState.MENU
 
 var selected_character: CharacterData = null
+var wave_speedup_enabled: bool = false  # Toggle for 2x wave speed
 
 enum GameState {
 	MENU,
@@ -64,8 +68,13 @@ func start_wave() -> void:
 	
 	is_wave_active = true
 	wave_timer = WAVE_DURATION
+	wave_time_elapsed = 0.0  # Reset elapsed time
 	wave_started.emit(current_wave)
 	spawn_enemies()
+
+
+func toggle_wave_speedup() -> void:
+	wave_speedup_enabled = not wave_speedup_enabled
 
 
 func spawn_enemies() -> void:
@@ -80,13 +89,27 @@ func _process(delta: float) -> void:
 		return
 	
 	if is_wave_active:
-		wave_timer -= delta
+		# Track elapsed time
+		wave_time_elapsed += delta
+		
+		# Calculate effective delta based on speedup
+		var effective_delta = delta
+		if wave_speedup_enabled:
+			effective_delta = delta * WAVE_SPEEDUP_MULTIPLIER
+		
+		wave_timer -= effective_delta
+		
+		# Ensure wave ends at minimum duration (30 seconds)
+		if wave_speedup_enabled and wave_time_elapsed >= MIN_WAVE_DURATION:
+			wave_timer = 0
+		
 		if wave_timer <= 0:
 			end_wave()
 
 
 func end_wave() -> void:
 	is_wave_active = false
+	wave_time_elapsed = 0.0
 	wave_ended.emit(current_wave)
 	
 	if enemies_remaining <= 0:
@@ -116,3 +139,4 @@ func return_to_menu() -> void:
 	game_state = GameState.MENU
 	selected_character = null
 	player = null
+	wave_speedup_enabled = false  # Reset speedup on return

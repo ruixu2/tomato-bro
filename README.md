@@ -20,6 +20,7 @@ A 2D top-down survivor roguelike game inspired by Brotato (土豆兄弟), built 
 | S / ↓ | Move Down |
 | A / ← | Move Left |
 | D / → | Move Right |
+| V | Toggle 2x Wave Speed |
 | ESC | Pause |
 
 ## Characters
