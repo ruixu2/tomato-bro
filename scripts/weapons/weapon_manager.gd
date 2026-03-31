@@ -7,7 +7,7 @@ signal weapon_removed(weapon: Weapon)
 signal weapon_equipped(weapon: Weapon, slot: int)
 signal weapon_swapped(old_weapon: Weapon, new_weapon: Weapon)
 
-const MAX_WEAPONS = 6
+const MAX_WEAPONS = 2
 
 var weapons: Array[Weapon] = []
 var equipped_slots: Array[int] = []
