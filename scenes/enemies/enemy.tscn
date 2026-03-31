@@ -1,0 +1,27 @@
+[gd_scene load_steps=3 format=3 uid="uid://enemy_scene"]
+
+[ext_resource type="Script" path="res://scripts/entities/enemy.gd" id="1_enemy"]
+[ext_resource type="PackedScene" uid="uid://pickup_scene" path="res://scenes/entities/pickup.tscn" id="2_pickup"]
+
+[node name="Enemy" type="CharacterBody2D"]
+script = ExtResource("1_enemy")
+collision_layer = 2
+collision_mask = 1
+max_health = 10
+health = 10
+move_speed = 50.0
+damage = 5
+xp_value = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+
+[node name="Sprite" type="Sprite2D" parent="."]
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 16.0
+scale = Vector2(2, 2)
+color = Color(0.8, 0.2, 0.2, 1)
+
+[node name="PickupSpawner" type="Node2D" parent="."]
+pickup_scene = ExtResource("2_pickup")

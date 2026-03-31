@@ -1,0 +1,18 @@
+# Godot engine ignore file
+# This file tells the Godot editor which files to exclude from the project
+
+# Unity legacy files (from previous project)
+Library/
+Logs/
+UserSettings/
+*.sln
+*.csproj
+.vsconfig
+
+# Build artifacts
+export.cfg
+export_presets.cfg
+
+# OS generated files
+.DS_Store
+Thumbs.db
